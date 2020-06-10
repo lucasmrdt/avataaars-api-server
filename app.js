@@ -48,4 +48,6 @@ if (app.get("env") === "development") {
   });
 }
 
-module.exports = app;
+app.listen(process.env.PORT || 1234, () => {
+  console.log(`start on http://localhost:${process.env.PORT || 1234}`);
+});
