@@ -1,24 +1,35 @@
-import express from 'express';
+import express from "express";
+import svg2png from "svg2png";
+import redis from "redis";
 
 // React Components
-import React from 'react';
-import RDS from 'react-dom/server';
-import Avataaars from './avataaars';
+import React from "react";
+import RDS from "react-dom/server";
+import Avataaars from "./avataaars";
+
+const { REDIS_URL } = process.env;
 
 const app = express();
+const client = redis.createClient({ url: REDIS_URL });
 
-app.get('/', (req, res) => {
-  const appString = RDS.renderToString(<Avataaars {...req.query} />);
-
-  res.writeHead(200, {
-    'Content-Type': 'image/svg+xml',
+app.get("/", async (req, res) => {
+  const key = JSON.stringify(req.query);
+  client.get(key, async (image) => {
+    if (!image) {
+      const appString = RDS.renderToString(<Avataaars {...req.query} />);
+      image = await svg2png(Buffer.from(appString, "utf8"));
+      client.set(key, image);
+    }
+    res.writeHead(200, {
+      "Content-Type": "image/png",
+    });
+    res.end(image);
   });
-  res.end(appString);
 });
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  let err = new Error('Not Found');
+app.use(function (req, res, next) {
+  let err = new Error("Not Found");
   err.status = 404;
   next(err);
 });
@@ -27,10 +38,10 @@ app.use(function(req, res, next) {
 
 // development error handler
 // will print stacktrace
-if (app.get('env') === 'development') {
-  app.use(function(err, req, res, next) {
+if (app.get("env") === "development") {
+  app.use(function (err, req, res, next) {
     res.status(err.status || 500);
-    res.render('error', {
+    res.end("error", {
       message: err.message,
       error: err,
     });
