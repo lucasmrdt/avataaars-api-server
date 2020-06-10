@@ -8,6 +8,10 @@
     "build": "./node_modules/webpack/bin/webpack.js",
     "buildWithWatch": "./node_modules/webpack/bin/webpack.js --watch"
   },
+  "engines": {
+    "node": ">= 6.9.4",
+    "npm": ">= 4.4.0"
+  },
   "dependencies": {
     "avataaars": "^1.0.2",
     "babel-core": "^6.26.0",
