@@ -1,30 +1,19 @@
 import express from "express";
 import svg2png from "svg2png";
-import redis from "redis";
-
 // React Components
 import React from "react";
 import RDS from "react-dom/server";
 import Avataaars from "./avataaars";
 
-const { REDIS_URL } = process.env;
-
 const app = express();
-const client = redis.createClient({ url: REDIS_URL });
 
 app.get("/", async (req, res) => {
-  const key = JSON.stringify(req.query);
-  client.get(key, async (image) => {
-    if (!image) {
-      const appString = RDS.renderToString(<Avataaars {...req.query} />);
-      image = await svg2png(Buffer.from(appString, "utf8"));
-      client.set(key, image);
-    }
-    res.writeHead(200, {
-      "Content-Type": "image/png",
-    });
-    res.end(image);
+  const appString = RDS.renderToString(<Avataaars {...req.query} />);
+  const image = await svg2png(Buffer.from(appString, "utf8"));
+  res.writeHead(200, {
+    "Content-Type": "image/png",
   });
+  res.end(image);
 });
 
 // catch 404 and forward to error handler

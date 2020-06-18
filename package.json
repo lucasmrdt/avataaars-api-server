@@ -20,7 +20,6 @@
     "morgan": "latest",
     "react": "^16.0.0",
     "react-dom": "^16.0.0",
-    "redis": "3.0.2",
     "svg2png": "4.1.1",
     "webpack": "^3.6.0"
   }
